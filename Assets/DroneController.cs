@@ -13,7 +13,8 @@ public class DroneController : MonoBehaviour {
 	float[] m_throttles = {0f,0f,0f,0f};
 
 	const float c_maxThrottle = 100f;
-	const float c_throttleScalar = 100f;
+	const float c_throttleIncreaseRate = 100f;
+	const float c_torqueScalar = 500f;
 
 	Rigidbody m_body;
 
@@ -44,11 +45,15 @@ public class DroneController : MonoBehaviour {
 		if (Input.GetKey(KeyCode.L)) {
 			TiltRight();
 		}
-
-
+		if (Input.GetKey(KeyCode.S)) {
+			YawRight();
+		}
+		if (Input.GetKey(KeyCode.D)) {
+			YawLeft();
+		}
 	#endregion
 
-	#region DisplayAndAnimation
+	#region GUIDisplayAndPropellerAnimation
 	for (int i = 0; i < m_propellers.Length; i++) {
 
 			m_throttleSliders[i].value = m_throttles[i];
@@ -56,13 +61,6 @@ public class DroneController : MonoBehaviour {
 			m_propellerBlades[i].m_propellerThrottle = m_throttles[i];
 
 	}
-
-	#endregion
-
-	#region PropellerAnimation
-
-
-
 
 	#endregion
 	}
@@ -133,9 +131,18 @@ public class DroneController : MonoBehaviour {
 
 	}
 
+	void YawRight () {
+		m_body.AddTorque (Vector3.up * -c_torqueScalar);
+	}
+
+	void YawLeft () {
+		m_body.AddTorque (Vector3.up * c_torqueScalar);
+
+	}
+
 
 	float ShiftThrottle (float referenceThrottle, float direction) {
-		float returnVal = (Time.deltaTime * direction * c_throttleScalar + referenceThrottle);
+		float returnVal = (Time.deltaTime * direction * c_throttleIncreaseRate + referenceThrottle);
 		if (returnVal > c_maxThrottle) {
 			returnVal = c_maxThrottle;
 		} else if (returnVal < 0) {
